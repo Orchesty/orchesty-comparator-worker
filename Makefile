@@ -1,5 +1,5 @@
 DC=docker-compose exec -T app
-IMAGE=orchesty/comomparator-worker:$(TAG)
+IMAGE=orchesty/comparator-worker:$(TAG)
 
 .env:
 	sed -e "s/{DEV_UID}/$(shell if [ "$(shell uname)" = "Linux" ]; then echo $(shell id -u); else echo '1001'; fi)/g" \
@@ -8,7 +8,8 @@ IMAGE=orchesty/comomparator-worker:$(TAG)
 
 # Build
 build: .env
-	docker buildx build --pull --push --platform linux/amd64,linux/arm64/v8 -t $(IMAGE) .
+	docker buildx create --name comparator-builder --driver docker-container 2>/dev/null || true
+	docker buildx build --builder comparator-builder --no-cache --push --platform linux/amd64,linux/arm64/v8 -t $(IMAGE) .
 
 docker-compose.ci.yml:
 	# Comment out any port forwarding
