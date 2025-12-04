@@ -1,0 +1,35 @@
+{
+  "name": "orchesty-comparator",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "test": "jest --coverage --detectOpenHandles --passWithNoTests",
+    "lint": "eslint src test --fix",
+    "lint-ci": "eslint src test",
+    "start": "nodemon src/server.ts",
+    "build": "rm -rf dist && tsc -p tsconfig.prod.json"
+  },
+  "keywords": [],
+  "author": "info@hanaboso.com",
+  "license": "Apache-2.0",
+  "packageManager": "pnpm@9.1.4",
+  "dependencies": {
+    "@orchesty/nodejs-sdk": "^4.3.5",
+    "ioredis": "^5.8.2",
+    "joi": "^18.0.2"
+  },
+  "devDependencies": {
+    "@hanaboso/eslint-plugin": "^1.2.5",
+    "@types/jest": "^30.0.0",
+    "@types/node": "^24.10.1",
+    "axios": "^1.13.2",
+    "axios-mock-adapter": "^2.1.0",
+    "eslint": "^9.39.1",
+    "jest": "^30.2.0",
+    "nodemon": "^3.1.11",
+    "ts-jest": "^29.4.6",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.3"
+  }
+}

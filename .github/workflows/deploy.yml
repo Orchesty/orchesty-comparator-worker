@@ -1,0 +1,22 @@
+name: Release new version
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - '*'
+
+jobs:
+  build:
+    runs-on: self-hosted
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Extract tag name
+        run: echo "TAG=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
+
+      - name: Build specific version
+        run: make build TAG=$TAG
+      
+      - name: Build latest
+        run: make build TAG=latest
