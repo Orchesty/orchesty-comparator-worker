@@ -15,14 +15,14 @@
   "license": "Apache-2.0",
   "packageManager": "pnpm@9.1.4",
   "dependencies": {
-    "@orchesty/nodejs-sdk": "^4.3.5",
+    "@orchesty/nodejs-sdk": "^4.3.6",
     "ioredis": "^5.8.2",
     "joi": "^18.0.2"
   },
   "devDependencies": {
     "@hanaboso/eslint-plugin": "^1.2.5",
     "@types/jest": "^30.0.0",
-    "@types/node": "^24.10.1",
+    "@types/node": "^24.10.2",
     "axios": "^1.13.2",
     "axios-mock-adapter": "^2.1.0",
     "eslint": "^9.39.1",
