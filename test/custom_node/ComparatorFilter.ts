@@ -46,7 +46,7 @@ describe('Tests for ComparatorFilter', () => {
                 idField: 'id',
                 masterKey: 'masterKey',
             },
-        } as IInput);
+        });
 
         const result = await node.processAction(dto);
         const resultData = result.getJsonData();
@@ -67,7 +67,7 @@ describe('Tests for ComparatorFilter', () => {
                 masterKey: 'masterKey',
                 passAsListOfExistingItems: true,
             },
-        } as IInput);
+        });
 
         const result = await node.processAction(dto);
         const resultData = result.getJsonData();
@@ -86,7 +86,7 @@ describe('Tests for ComparatorFilter', () => {
                 passAsListOfExistingItems: true,
                 skipComparison: true,
             },
-        } as IInput);
+        });
 
         const result = await node.processAction(dto);
         const resultData = result.getJsonData();
@@ -102,7 +102,7 @@ describe('Tests for ComparatorFilter', () => {
                 idField: 'id',
                 masterKey: 'masterKey',
             },
-        } as IInput);
+        });
 
         const result = await node.processAction(dto);
         const resultData = result.getJsonData();
@@ -123,7 +123,7 @@ describe('Tests for ComparatorFilter', () => {
                 masterKey: 'masterKey',
                 excludedFields: ['exc.innr'],
             },
-        } as IInput);
+        });
 
         const result = await node.processAction(dto);
         const resultData = result.getJsonData();
@@ -143,7 +143,7 @@ describe('Tests for ComparatorFilter', () => {
                 excludedFields: ['exc.innr'],
                 stopOnEmptyArray: true,
             },
-        } as IInput);
+        });
 
         const result2 = await node.processAction(dto);
         const resultData2 = result2.getJsonData();
@@ -161,7 +161,7 @@ describe('Tests for ComparatorFilter', () => {
                 masterKey: 'masterKey',
                 lock: true,
             },
-        } as IInput);
+        });
 
         const result = await node.processAction(dto);
         const resultData = result.getJsonData();
@@ -182,7 +182,7 @@ describe('Tests for ComparatorFilter', () => {
                 masterKey: 'masterKey',
                 lock: true,
             },
-        } as IInput);
+        });
 
         await redisStorage.lock('masterKey');
         const result = await node.processAction(dto);
@@ -201,7 +201,7 @@ describe('Tests for ComparatorFilter', () => {
                 idField: 'id',
                 masterKey: 'masterKey',
             },
-        } as IInput);
+        });
 
         const result = await node.processAction(dto);
         const resultData = result.getJsonData();
@@ -226,7 +226,7 @@ describe('Tests for ComparatorFilter', () => {
                 deleted: true,
                 isLast: true,
             },
-        } as IInput);
+        });
 
         const result = await node.processAction(dto);
         const resultData = result.getJsonData();
@@ -295,7 +295,7 @@ describe('Tests for ComparatorFilter', () => {
                 isLast: false,
                 totalCount: 4,
             },
-        } as IInput);
+        });
 
         let result = await node.processAction(dto);
         let resultData = result.getJsonData();
@@ -316,7 +316,7 @@ describe('Tests for ComparatorFilter', () => {
                 isLast: true,
                 totalCount: 4,
             },
-        } as IInput);
+        });
 
         result = await node.processAction(dto);
         resultData = result.getJsonData();
@@ -385,7 +385,7 @@ describe('Tests for ComparatorFilter', () => {
                 isLast: true,
                 totalCount: 3,
             },
-        } as IInput);
+        });
 
         let result = await node.processAction(dto);
         let resultData = result.getJsonData();
@@ -405,7 +405,7 @@ describe('Tests for ComparatorFilter', () => {
                 isLast: false,
                 totalCount: 3,
             },
-        } as IInput);
+        });
 
         result = await node.processAction(dto);
         resultData = result.getJsonData();
@@ -427,7 +427,7 @@ describe('Tests for ComparatorFilter', () => {
                 masterKey: 'masterKey',
                 deleted: true,
             },
-        } as IInput);
+        });
 
         let result = await node.processAction(dto);
         let resultData = result.getJsonData();
@@ -445,7 +445,7 @@ describe('Tests for ComparatorFilter', () => {
                 masterKey: 'masterKey',
                 deleted: true,
             },
-        } as IInput);
+        });
 
         result = await node.processAction(dto);
         resultData = result.getJsonData();

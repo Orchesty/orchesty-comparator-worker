@@ -8,9 +8,12 @@ services:
         volumes:
             - ./:/var/www:cached
         environment:
-            # Envs for tests are load from node-sdk/.jest/testEnvs.js
+            # Envs for tests are load from .jest/testEnvs.ts
             JEST_DOCKER: 1
             APP_ENV: debug
+            TENANT_ID: docker
+            CRYPT_SECRET: ThisIsNotSoSecret
+            ORCHESTY_API_KEY: ThisIsNotSoSecretApiKey
         command: sleep infinity
 
     redis:

@@ -14,6 +14,10 @@ const compat = new FlatCompat({
 export default [
   ...compat.extends('plugin:@hanaboso/orchesty'),
   {
-    rules: {},
+    rules: {
+      'jest/expect-expect': ['error', {
+        assertFunctionNames: ['expect', '*.testBatch', '*.testConnector', '*.testCustomNode'],
+      }],
+    },
   }
 ];
