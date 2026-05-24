@@ -13,23 +13,23 @@
   "keywords": [],
   "author": "info@hanaboso.com",
   "license": "Apache-2.0",
-  "packageManager": "pnpm@9.1.4",
   "dependencies": {
-    "@orchesty/nodejs-sdk": "^4.3.6",
-    "ioredis": "^5.8.2",
-    "joi": "^18.0.2"
+    "@orchesty/nodejs-sdk": "^5.0.10",
+    "ioredis": "^5.10.1",
+    "joi": "^18.2.1"
   },
   "devDependencies": {
+    "@eslint/eslintrc": "^3.3.5",
+    "@eslint/js": "^10.0.1",
     "@hanaboso/eslint-plugin": "^1.2.5",
     "@types/jest": "^30.0.0",
-    "@types/node": "^24.10.2",
-    "axios": "^1.13.2",
+    "@types/node": "^25.9.1",
     "axios-mock-adapter": "^2.1.0",
-    "eslint": "^9.39.1",
-    "jest": "^30.2.0",
-    "nodemon": "^3.1.11",
-    "ts-jest": "^29.4.6",
+    "eslint": "^10.4.0",
+    "jest": "^30.4.2",
+    "nodemon": "^3.1.14",
+    "ts-jest": "^29.4.11",
     "ts-node": "^10.9.2",
-    "typescript": "^5.9.3"
+    "typescript": "^6.0.3"
   }
 }

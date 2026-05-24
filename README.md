@@ -9,13 +9,12 @@
     services:
         ...
         orchesty-comparator-worker:
-            image: orchesty/comparator-worker:latest
+            image: orchesty/comparator-worker:2.0.0
             environment:
+                TENANT_ID: docker
                 CRYPT_SECRET: ${CRYPT_SECRET}
-                BACKEND_URL: ${BACKEND_URL}
-                STARTING_POINT_DSN: ${STARTING_POINT_DSN}
-                WORKER_API_HOST: ${WORKER_API_HOST}
                 ORCHESTY_API_KEY: ${ORCHESTY_API_KEY}
+                REDIS_DSN: redis://redis:6379
 
         redis:
             image: redis
