@@ -25,6 +25,12 @@ docker-down-clean: .env
 install:
 	$(DC) pnpm install
 
+update:
+	$(DC) pnpm update
+
+outdated:
+	$(DC) pnpm outdated
+
 lint:
 	$(DC) pnpm run lint-ci
 
