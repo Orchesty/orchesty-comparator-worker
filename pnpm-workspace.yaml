@@ -1,9 +1,14 @@
+catalog:
+  eslint: ^10.8.0
+
 overrides:
-  eslint: $eslint
-  '@orchesty/nodejs-sdk': $@orchesty/nodejs-sdk
+  eslint: 'catalog:'
 
 allowBuilds:
   protobufjs: true
   unrs-resolver: true
 
 confirmModulesPurge: false
+
+minimumReleaseAgeExclude:
+  - '@orchesty/nodejs-sdk'

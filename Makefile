@@ -1,4 +1,5 @@
-DC=docker-compose exec -T app
+DC=docker compose
+DCS=$(DC) exec -T app
 IMAGE=orchesty/comparator-worker:$(TAG)
 
 .env:
@@ -16,26 +17,26 @@ docker-compose.ci.yml:
 	sed -r 's/^(\s+ports:)$$/#\1/g; s/^(\s+- \$$\{DEV_IP\}.*)$$/#\1/g;' docker-compose.yml > docker-compose.ci.yml
 
 init: .env
-	docker-compose pull --ignore-pull-failures
-	docker-compose up -d --force-recreate --remove-orphans --build
+	$(DC) pull --ignore-pull-failures
+	$(DC) up -d --force-recreate --remove-orphans --build
 
 docker-down-clean: .env
-	docker-compose down -v
+	$(DC) down -v
 
 install:
-	$(DC) pnpm install
+	$(DCS) pnpm install
 
 update:
-	$(DC) pnpm update
+	$(DCS) pnpm update
 
 outdated:
-	$(DC) pnpm outdated
+	$(DCS) pnpm outdated
 
 lint:
-	$(DC) pnpm run lint-ci
+	$(DCS) pnpm run lint-ci
 
 unit:
-	$(DC) pnpm run test
+	$(DCS) pnpm run test
 
 fasttest: lint unit
 
