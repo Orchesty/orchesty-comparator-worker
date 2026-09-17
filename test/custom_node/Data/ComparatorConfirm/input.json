@@ -1,0 +1,8 @@
+{
+    "headers": {
+        "comparator-draft-id": "fixed-draft"
+    },
+    "data": {
+        "any": "payload"
+    }
+}

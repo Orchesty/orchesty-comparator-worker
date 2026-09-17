@@ -9,7 +9,7 @@
     services:
         ...
         orchesty-comparator-worker:
-            image: orchesty/comparator-worker:2.0.0
+            image: orchesty/comparator-worker:2.1.0
             environment:
                 TENANT_ID: docker
                 CRYPT_SECRET: ${CRYPT_SECRET}
@@ -31,7 +31,7 @@
 
 ## How to use it ?
 
-Comparator has a 2 custom nodes.
+Comparator has 4 nodes: 3 custom nodes and 1 batch node.
 
 ### 1. Comparator Filter
 
@@ -65,6 +65,9 @@ Input interface:
                                                             //  This options can't be used with "deleted" feature.
         "skipComparison": false,                            // If is true, comparator will skip whole comparison and return all items from input.
         "lock": false,                                      // If is true, comparator will lock master key for other processes.
+        "requireConfirmation": false,                       // If is true, comparator only drafts the detected changes and puts the draft id into the "comparator-draft-id" header.
+                                                            //  The cache is updated only when the message reaches the "Comparator Confirm" node (see below). Default: false.
+        "confirmationTtl": 86400,                           // How long (in seconds) an unconfirmed draft is kept. Default: 86400 (24 hours).
     }   
 }
 ```
@@ -104,6 +107,51 @@ Output interface:
 
 ```json
     {}
+```
+
+
+### 3. Comparator Confirm
+
+Use it together with `requireConfirmation: true` on the Comparator Filter. Place it after the node that processes the comparator output.
+
+It has two modes, chosen by the headers of the incoming message:
+
+- **Whole page** (header `comparator-draft-id` only): the whole draft is written to the cache. Use it when the comparator output is processed as one message.
+- **Single item** (headers `comparator-draft-id` and `comparator-item-id`, set by the Comparator Split): only that item is written to the cache, or removed from it for a deleted id. The draft disappears once every item of the page has been confirmed.
+
+Input interface:
+
+```json
+    { ... }                                                 // Any body; header "comparator-draft-id" set by the Comparator Filter,
+                                                            //  optionally "comparator-item-id" and "comparator-item-op" set by the Comparator Split
+```
+
+Output interface:
+
+```json
+    { ... }                                                 // Input body unchanged, comparator headers removed
+```
+
+
+### 4. Comparator Split
+
+Use it together with `requireConfirmation: true` on the Comparator Filter. Place it right after the Comparator Filter when the following nodes process items one by one.
+
+Input interface:
+
+```json
+    {
+        "created": [ {...} ],                               // Standard Comparator Filter output
+        "updated": [ {...} ],
+        "deleted": [ "id" ]
+    }
+```
+
+Output interface (one message per item):
+
+```json
+    { ... }                                                 // Item from "created" or "updated", body unchanged
+    "id"                                                    // Item from "deleted", body is the id
 ```
 
 

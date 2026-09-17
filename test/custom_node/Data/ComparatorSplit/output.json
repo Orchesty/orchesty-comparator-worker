@@ -1,0 +1,28 @@
+{
+    "headers": {
+        "comparator-draft-id": "fixed-draft"
+    },
+    "data": [
+        {
+            "headers": {
+                "comparator-item-id": "1",
+                "comparator-item-op": "created"
+            },
+            "body": "{\"id\":1,\"name\":\"a\"}"
+        },
+        {
+            "headers": {
+                "comparator-item-id": "2",
+                "comparator-item-op": "updated"
+            },
+            "body": "{\"id\":2,\"name\":\"b\"}"
+        },
+        {
+            "headers": {
+                "comparator-item-id": "3",
+                "comparator-item-op": "deleted"
+            },
+            "body": "\"3\""
+        }
+    ]
+}

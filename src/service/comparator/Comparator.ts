@@ -1,8 +1,12 @@
 import crypto from 'crypto';
 import RedisStorage from '../../storage/RedisStorage';
-import { IConfiguration, IInput, IOutput } from './types';
+import { IConfiguration, IDraft, IInput, IOutput } from './types';
 
 export const HASH_ALG = 'sha1';
+export const DRAFT_ID_HEADER = 'comparator-draft-id';
+export const ITEM_ID_HEADER = 'comparator-item-id';
+export const ITEM_OP_HEADER = 'comparator-item-op';
+export const DEFAULT_CONFIRMATION_TTL = 24 * 60 * 60;
 
 export class Comparator {
 
@@ -11,7 +15,7 @@ export class Comparator {
     ) {
     }
 
-    public async compare(input: IInput, correlationId: string): Promise<IOutput> {
+    public async compare(input: IInput, correlationId: string, draft?: IDraft): Promise<IOutput> {
         const config = input.configuration;
         const output = this.getEmptyOutput();
 
@@ -42,23 +46,31 @@ export class Comparator {
         });
 
         const pipeline = this.redis.getPipeline();
+        let hasCommands = false;
+
         if (dataToStore.length > 0) {
-            this.redis.hmSet(pipeline, config.masterKey, dataToStore, config.ttl);
+            if (draft) {
+                this.addToDraft(draft, dataToStore);
+            } else {
+                this.redis.hmSet(pipeline, config.masterKey, dataToStore, config.ttl);
+                hasCommands = true;
+            }
         }
 
         if (bufferedData.length > 0) {
             const bufferKey = this.redis.getBufferKey(correlationId);
             this.redis.hmSet(pipeline, bufferKey, bufferedData, config.ttl ?? 3600);
+            hasCommands = true;
         }
 
-        if (dataToStore.length > 0 || bufferedData.length > 0) {
+        if (hasCommands) {
             await pipeline.exec();
         }
 
         return output;
     }
 
-    public async getDeletedItems(config: IConfiguration, correlationId: string): Promise<string[]> {
+    public async getDeletedItems(config: IConfiguration, correlationId: string, draft?: IDraft): Promise<string[]> {
         if (!config.totalCount && !config.isLast) {
             return [];
         }
@@ -76,9 +88,13 @@ export class Comparator {
         const deletedItems = existingItems.filter((id) => !bufferedItems.includes(id));
 
         if (deletedItems.length > 0) {
-            const pipeline = this.redis.getPipeline();
-            pipeline.hdel(config.masterKey, ...deletedItems);
-            await pipeline.exec();
+            if (draft) {
+                draft.deleted.push(...deletedItems);
+            } else {
+                const pipeline = this.redis.getPipeline();
+                pipeline.hdel(config.masterKey, ...deletedItems);
+                await pipeline.exec();
+            }
         }
 
         return deletedItems;
@@ -86,6 +102,14 @@ export class Comparator {
 
     public getEmptyOutput(): IOutput {
         return { created: [], updated: [], deleted: [] };
+    }
+
+    public createDraft(config: IConfiguration): IDraft {
+        return { masterKey: config.masterKey, idField: config.idField, ttl: config.ttl, items: {}, deleted: [] };
+    }
+
+    public isDraftEmpty(draft: IDraft): boolean {
+        return Object.keys(draft.items).length === 0 && draft.deleted.length === 0;
     }
 
     private createHash(data: object, excludedFields: string[] = []): string {
@@ -122,6 +146,13 @@ export class Comparator {
 
         if (config.deleted === true) {
             bufferedData.push(externalId, hash);
+        }
+    }
+
+    private addToDraft(draft: IDraft, dataToStore: string[]): void {
+        for (let i = 0; i < dataToStore.length; i += 2) {
+            // eslint-disable-next-line no-param-reassign
+            draft.items[dataToStore[i]] = dataToStore[i + 1];
         }
     }
 

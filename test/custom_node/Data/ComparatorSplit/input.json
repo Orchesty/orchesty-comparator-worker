@@ -1,0 +1,22 @@
+{
+    "headers": {
+        "comparator-draft-id": "fixed-draft"
+    },
+    "data": {
+        "created": [
+            {
+                "id": 1,
+                "name": "a"
+            }
+        ],
+        "updated": [
+            {
+                "id": 2,
+                "name": "b"
+            }
+        ],
+        "deleted": [
+            "3"
+        ]
+    }
+}

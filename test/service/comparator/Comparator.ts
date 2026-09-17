@@ -38,6 +38,37 @@ describe('Comparator', () => {
         // Deleted is not part of output1 as it's added later by CustomNode
     });
 
+    it('compare with draft - master key is not touched', async () => {
+        const configuration = { idField: 'customId', masterKey: 'draftMasterKey', deleted: true };
+        const draft = comparator.createDraft(configuration);
+
+        const result = await comparator.compare({ configuration, items: input }, 'corr-1', draft);
+        const values = await redisStorage.getValues('draftMasterKey', ['15ss', '16xs', 'kvsHSBDPJb']);
+        const buffered = await redisStorage.getCount(redisStorage.getBufferKey('corr-1'));
+
+        expect(result).toEqual(output);
+        expect(Object.keys(draft.items)).toStrictEqual(['15ss', '16xs', 'kvsHSBDPJb']);
+        expect(draft.deleted).toStrictEqual([]);
+        expect(values).toStrictEqual([null, null, null]);
+        expect(buffered).toBe(3);
+    });
+
+    it('getDeletedItems with draft - master key is not touched', async () => {
+        const configuration = { idField: 'customId', masterKey: 'draftDeleteKey', deleted: true, isLast: true };
+        const pipeline = redisStorage.getPipeline();
+        redisStorage.hmSet(pipeline, 'draftDeleteKey', ['old', 'hash']);
+        await pipeline.exec();
+
+        const draft = comparator.createDraft(configuration);
+        await comparator.compare({ configuration, items: input }, 'corr-2', draft);
+        const deleted = await comparator.getDeletedItems(configuration, 'corr-2', draft);
+        const keys = await redisStorage.getKeys('draftDeleteKey');
+
+        expect(deleted).toStrictEqual(['old']);
+        expect(draft.deleted).toStrictEqual(['old']);
+        expect(keys).toStrictEqual(['old']);
+    });
+
     it('performance test', async () => {
         const numberOfItems = 50_000;
         const bigInput = [];
