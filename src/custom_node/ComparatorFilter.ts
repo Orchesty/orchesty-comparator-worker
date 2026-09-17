@@ -4,10 +4,14 @@ import { CORRELATION_ID } from '@orchesty/nodejs-sdk/dist/lib/Utils/Headers';
 import ProcessDto from '@orchesty/nodejs-sdk/dist/lib/Utils/ProcessDto';
 import ResultCode from '@orchesty/nodejs-sdk/dist/lib/Utils/ResultCode';
 import { validate } from '@orchesty/nodejs-sdk/dist/lib/Utils/Validations';
+import crypto from 'crypto';
 import Joi from 'joi';
 import {
     Comparator,
+    DEFAULT_CONFIRMATION_TTL,
+    DRAFT_ID_HEADER,
     IConfiguration,
+    IDraft,
     IInput as IComparatorInput,
     IOutput as IComparatorOutput,
 } from '../service/comparator';
@@ -29,6 +33,8 @@ const schema = Joi.object({
         lock: Joi.boolean().optional().allow(null),
         deleted: Joi.boolean().optional().allow(null),
         isLast: Joi.boolean().optional().allow(null),
+        requireConfirmation: Joi.boolean().optional().allow(null),
+        confirmationTtl: Joi.number().integer().positive().optional().allow(null),
     }).required(),
 });
 
@@ -60,14 +66,28 @@ export class ComparatorFilter extends ACommonNode {
                 }
             }
 
-            const output = await this.getOutput(input, correlationId);
-            output.deleted = await this.getDeletedItems(input.configuration, correlationId);
+            const draft = input.configuration.requireConfirmation === true
+                ? this.comparator.createDraft(input.configuration)
+                : undefined;
+
+            const output = await this.getOutput(input, correlationId, draft);
+            output.deleted = await this.getDeletedItems(input.configuration, correlationId, draft);
 
             if (input.configuration.stopOnEmptyArray) {
                 const allLen = output.created.length + output.updated.length + output.deleted.length;
                 if (allLen === 0) {
                     return dto.setStopProcess(ResultCode.DO_NOT_CONTINUE, 'Empty comparator result') as unknown as ProcessDto<IOutput>;
                 }
+            }
+
+            if (draft && !this.comparator.isDraftEmpty(draft)) {
+                const draftId = crypto.randomUUID();
+                await this.redis.saveDraft(
+                    draftId,
+                    draft,
+                    input.configuration.confirmationTtl ?? DEFAULT_CONFIRMATION_TTL,
+                );
+                dto.addHeader(DRAFT_ID_HEADER, draftId);
             }
 
             if (input.configuration.passAsListOfExistingItems) {
@@ -86,7 +106,7 @@ export class ComparatorFilter extends ACommonNode {
         }
     }
 
-    private async getOutput(input: IInput, correlationId: string): Promise<IOutput> {
+    private async getOutput(input: IInput, correlationId: string, draft?: IDraft): Promise<IOutput> {
         if (input.configuration.skipComparison === true) {
             const output = this.comparator.getEmptyOutput();
             input.items.forEach((it) => {
@@ -96,16 +116,16 @@ export class ComparatorFilter extends ACommonNode {
             return output;
         }
 
-        return this.comparator.compare(input, correlationId);
+        return this.comparator.compare(input, correlationId, draft);
     }
 
     private isLockable(config: IConfiguration): boolean {
         return !config.skipComparison && config.lock === true;
     }
 
-    private async getDeletedItems(config: IConfiguration, correlationId: string): Promise<string[]> {
+    private async getDeletedItems(config: IConfiguration, correlationId: string, draft?: IDraft): Promise<string[]> {
         if (config.deleted === true) {
-            return this.comparator.getDeletedItems(config, correlationId);
+            return this.comparator.getDeletedItems(config, correlationId, draft);
         }
 
         return [];
