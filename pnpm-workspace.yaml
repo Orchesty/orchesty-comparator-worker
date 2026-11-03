@@ -1,15 +1,10 @@
-catalog:
-  eslint: ^10.10.0
-
-overrides:
-  eslint: 'catalog:'
-
 allowBuilds:
   '@parcel/watcher': false
   protobufjs: true
   unrs-resolver: true
 
-yes: true
-
 minimumReleaseAgeExclude:
-  - '@orchesty/nodejs-sdk'
+  - '@hanaboso/*'
+  - '@orchesty/*'
+
+yes: true
